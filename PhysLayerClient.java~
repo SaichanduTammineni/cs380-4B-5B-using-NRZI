@@ -1,0 +1,122 @@
+//package excercise1;
+import java.io.InputStream;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.net.Socket;
+import java.io.OutputStream;
+import java.io.PrintStream;
+
+// Run the client second, it will connect to a running server
+// based on the host and port specified
+public final class PhysLayerCLient {
+
+    public static void main(String[] args) throws Exception {
+        try (Socket socket = new Socket("codebank.xyz", 38002)) {
+            OutputStream os = socket.getOutputStream();
+            InputStream is = socket.getInputStream();
+            
+            System.out.println("Connected to Server");
+
+            int[] preamble = new int[64];
+            for(int i = 0; i<64;i++){
+            	preamble[i] = is.read();
+            }
+            double avg;
+          	for(int i=0;i<64;i++){
+          		avg+=preamble[i];
+          	}
+          	avg = avg/64;
+          	System.out.println("Baseline establisthed from preamble: "+ avg);
+
+          	byte[] data = new byte[32];
+          	for(int i = 0;i<32;i++){
+          		byte fourB = (byte)is.read();
+          		byte fiveB;
+          		switch(fourB){
+          			case 0: fiveB = 30;
+          				break;
+          			case 1: fiveB = 9;
+          				break;
+          			case 2: fiveB = 20;
+          				break;
+          			case 3: fiveB = 21;
+          				break;
+          			case 4: fiveB = 10;
+          				break;
+					case 5: fiveB = 11;
+          				break;
+          			case 6: fiveB = 14;
+          				break;
+          			case 7: fiveB = 15;
+          				break;
+          			case 8: fiveB = 18;
+          				break;
+          			case 9: fiveB = 19;
+          				break;
+          			case 10: fiveB = 22;
+          				break;
+          			case 11: fiveB = 23;
+          				break;
+          			case 12: fiveB = 26;
+          				break;
+          			case 13: fiveB = 27;
+          				break;
+          			case 14: fiveB = 28;
+          				break;
+          			case 15: fiveB = 29;
+          				break;
+          		}
+          		data[i] = fiveB;
+          	}
+
+          	System.out.print("Received 32 bytes: ");
+          	for(int i = 0;i<32;i++){
+          		System.out.printf("%02X", data[i]);
+          	}
+
+          	os.write(data);
+
+          	if(is.read() == 1){
+    			System.out.println("Response good.");
+    		}else{
+    			System.out.println("Response bad.");
+    		}
+    		System.out.println("Disconnected from server");
+            socket.close();
+            System.exit(0);
+        }
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
